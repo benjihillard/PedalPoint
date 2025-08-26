@@ -1,0 +1,48 @@
+/* Custom styles for Pedal Point */
+
+.App {
+  text-align: left;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-cycling-600 text-white px-4 py-2 rounded-md hover:bg-cycling-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply border border-cycling-600 text-cycling-600 px-4 py-2 rounded-md hover:bg-cycling-50 transition-colors;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply hover:shadow-md transition-shadow duration-200;
+}
+
+/* Loading animation */
+.loading-spinner {
+  @apply animate-spin rounded-full h-6 w-6 border-b-2 border-cycling-600;
+}
