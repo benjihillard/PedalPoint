@@ -1,77 +1,69 @@
-# Pedal Point Frontend
+# React + TypeScript + Vite
 
-React-based web application for the Pedal Point cycling platform.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- **Modern React 18** with TypeScript
-- **Responsive Design** with Tailwind CSS
-- **Routing** with React Router
-- **Beautiful UI** with Heroicons and custom cycling theme
-- **Mobile-First** design approach
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Pages
+## Expanding the ESLint configuration
 
-- **Home** - Welcome page with app overview and features
-- **Rides** - Browse and search available cycling rides
-- **Profile** - User profile management and settings
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Tech Stack
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-- React 18
-- TypeScript
-- React Router DOM
-- Tailwind CSS
-- Heroicons
-- Axios (for future API calls)
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-## Setup
-
-1. Install dependencies:
-```bash
-npm install
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-2. Start development server:
-```bash
-npm start
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-3. Build for production:
-```bash
-npm run build
-```
-
-## Development
-
-The app will run on `http://localhost:3000` in development mode.
-
-## Project Structure
-
-```
-src/
-├── components/     # Reusable UI components
-│   └── Header.tsx # Main navigation header
-├── pages/         # Page components
-│   ├── Home.tsx   # Home page
-│   ├── Rides.tsx  # Rides listing page
-│   └── Profile.tsx # User profile page
-├── App.tsx        # Main app component with routing
-├── index.tsx      # App entry point
-└── index.css      # Global styles with Tailwind
-```
-
-## Styling
-
-- **Tailwind CSS** for utility-first styling
-- **Custom cycling theme** with cycling-specific colors
-- **Responsive design** for all screen sizes
-- **Accessibility** focused with proper focus states
-
-## Future Enhancements
-
-- User authentication
-- Real-time ride updates
-- Interactive maps
-- Push notifications
-- Progressive Web App features
