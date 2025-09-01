@@ -1,63 +1,68 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+const axios = require('axios');
 require('dotenv').config();
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// Start server function
+async function startServer() {
+  const app = express();
 
-// Middleware
-app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
-app.use(morgan('combined')); // Logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+  // Enable CORS
+  app.use(cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'http://192.168.86.59:5173'],
+    credentials: true
+  }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Pedal Point API is running',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
-  });
-});
+  // Location search endpoint
+  app.get('/api/location/search', async (req, res) => {
+    try {
+      const { q: searchQuery } = req.query;
 
-// Basic API endpoint
-app.get('/api', (req, res) => {
-  res.json({
-    message: 'Welcome to Pedal Point API',
-    version: '1.0.0',
-    endpoints: {
-      health: '/health',
-      api: '/api'
+      if (!searchQuery || searchQuery.length < 3) {
+        return res.json([]);
+      }
+
+      console.log('searchQuery', searchQuery);
+
+      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          format: 'json',
+          q: searchQuery,
+          countrycodes: 'us',
+          limit: 5,
+          addressdetails: 1,
+          dedupe: 1
+        },
+        headers: {
+          'User-Agent': 'PedalPoint/1.0'
+        },
+        timeout: 10000 // 10 second timeout
+      });
+      return res.json(response.data);
+    } catch (error) {
+      console.error('Location search error:', error);
+
+      // If OpenStreetMap is down, return empty array instead of error
+      if (error.response?.status === 503) {
+        console.log('OpenStreetMap API is temporarily unavailable, returning empty results');
+        return res.json([]);
+      }
+
+      res.status(500).json({
+        error: 'Failed to fetch location data',
+        message: error.message
+      });
     }
   });
-});
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  // Start Express server
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚴‍♂️ Pedal Point API server running on port ${PORT}`);
+    console.log(`🔍 Location search endpoint: http://localhost:${PORT}/api/location/search`);
+    console.log(`🌐 Network access: http://192.168.86.59:${PORT}/api/location/search`);
   });
-});
+}
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Endpoint not found',
-    message: `The endpoint ${req.originalUrl} does not exist`
-  });
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚴‍♂️ Pedal Point API server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`🌐 API base: http://localhost:${PORT}/api`);
-});
-
-module.exports = app; 
+// Start the server
+startServer().catch(console.error);

@@ -1,69 +1,120 @@
-# React + TypeScript + Vite
+# Pedal Point Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Vite React app with GraphQL, React Router, and React Hook Form for the Pedal Point cycling platform.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Vite** - Fast build tool and dev server
+- **React 18** with TypeScript
+- **GraphQL** with Apollo Client for data fetching
+- **React Router** for navigation
+- **React Hook Form** (TanStack Form) for forms
+- **GraphQL Code Generation** for type-safe queries
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 18 + TypeScript
+- Vite
+- Apollo Client v4
+- GraphQL
+- React Router DOM
+- TanStack React Form
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Setup
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. Install dependencies:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Start development server:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+3. Build for production:
+
+```bash
+npm run build
+```
+
+## GraphQL Setup
+
+### Apollo Client Configuration
+
+The Apollo Client is configured in `src/lib/apollo-client.ts` and wraps your app in `src/App.tsx`.
+
+### GraphQL Queries
+
+Example queries are defined in `src/graphql/queries.ts`:
+
+- `GET_RIDES` - Fetch all available rides
+- `GET_RIDE` - Fetch a single ride by ID
+- `GET_USER_PROFILE` - Fetch user profile data
+
+### Using GraphQL in Components
+
+```tsx
+import { useQuery } from '@apollo/client/react';
+import { GET_RIDES } from '../graphql/queries';
+
+const RidesList = () => {
+  const { loading, error, data } = useQuery(GetsData>(GET_RIDES);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      {data.rides.map(ride => (
+        <div key={ride.id}>{ride.title}</div>
+      ))}
+    </div>
+  );
+};
+```
+
+## GraphQL Code Generation
+
+Generate TypeScript types from your GraphQL schema:
+
+```bash
+# Generate types once
+npm run codegen
+
+# Watch for changes and regenerate
+npm run codegen:watch
+```
+
+Update the GraphQL endpoint in `codegen.ts` to match your backend.
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   └── RidesList.tsx   # Example GraphQL component
+├── graphql/            # GraphQL queries and mutations
+│   └── queries.ts      # Example queries
+├── lib/                # Library configurations
+│   └── apollo-client.ts # Apollo Client setup
+├── App.tsx             # Main app with Apollo Provider
+└── main.tsx            # App entry point
+```
+
+## Development
+
+- **Port**: 5173 (Vite default)
+- **GraphQL Endpoint**: Configure in `apollo-client.ts` and `codegen.ts`
+- **Hot Reload**: Enabled by default with Vite
+
+## Next Steps
+
+1. **Set up your GraphQL backend** and update the endpoint URLs
+2. **Run code generation** to get TypeScript types
+3. **Create more queries** for your cycling app features
+4. **Add mutations** for creating/updating rides and user data
+5. **Set up React Router** for navigation between pages
+6. **Use React Hook Form** for user input forms
