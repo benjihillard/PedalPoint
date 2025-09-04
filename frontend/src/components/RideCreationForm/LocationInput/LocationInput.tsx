@@ -1,92 +1,79 @@
 import { Combobox, TextInput, useCombobox } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useOpenStreetMapLocation } from '../../../reactQuery/useOpenStreetMapLocation';
 
-const useLocationSearch = (searchQuery: string) => {
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const {
-    data: locations,
-    isLoading,
-    isError,
-  } = useOpenStreetMapLocation(debouncedQuery);
-
-  console.log('locations', locations);
-
+function LocationOptions(searchQuery: string) {
+  const { data, isLoading, isError } = useOpenStreetMapLocation(searchQuery);
   if (isLoading) {
-    return [<Combobox.Empty key='loading'>Loading...</Combobox.Empty>];
+    return <Combobox.Empty>Loading...</Combobox.Empty>;
   }
 
-  if (isError) {
-    return [<Combobox.Empty key='error'>No results found</Combobox.Empty>];
+  if (isError || !data?.length) {
+    return <Combobox.Empty>No results</Combobox.Empty>;
   }
 
-  if (!locations?.length) {
-    return [<Combobox.Empty key='empty'>No results found</Combobox.Empty>];
-  }
-
-  // Filter duplicates based on display_name
-  const uniqueLocations = locations.filter(
-    (location, index, self) =>
-      index === self.findIndex(l => l.display_name === location.display_name)
+  // Remove duplicates based on place_id
+  const uniqueOptions = data.filter(
+    (option, index, self) =>
+      index === self.findIndex(o => o.place_id === option.place_id)
   );
 
-  return uniqueLocations.map((location: any, index: number) => (
-    <Combobox.Option
-      value={location.display_name}
-      key={`${location.display_name}-${index}`}
-    >
-      {location.display_name}
-    </Combobox.Option>
-  ));
-};
+  return (
+    <>
+      {uniqueOptions.map(option => (
+        <Combobox.Option value={option} key={option.place_id}>
+          {option.display_name}
+        </Combobox.Option>
+      ))}
+    </>
+  );
+}
 
-export function LocationInput({ form }) {
+interface LocationInputProps {
+  form: any;
+  label?: string;
+  placeholder?: string;
+  formField: string;
+}
+
+export function LocationInput({
+  form,
+  label = 'Location',
+  placeholder = 'Enter a location',
+  formField,
+}: LocationInputProps) {
   const combobox = useCombobox();
   const [searchQuery, setSearchQuery] = useState('');
-
-  const options = useLocationSearch(searchQuery);
 
   return (
     <Combobox
       onOptionSubmit={optionValue => {
-        setSearchQuery(optionValue);
+        setSearchQuery(optionValue?.display_name);
+        form.setFieldValue(formField, optionValue);
         combobox.closeDropdown();
       }}
       store={combobox}
     >
       <Combobox.Target>
         <TextInput
-          label='Location'
-          placeholder='Enter an address'
+          required
+          label={label}
+          placeholder={placeholder}
           value={searchQuery}
           onChange={event => {
-            setSearchQuery(event.currentTarget.value);
+            const value = event.currentTarget.value;
+            setSearchQuery(value);
+            form.setFieldValue(formField, value);
             combobox.openDropdown();
             combobox.updateSelectedOptionIndex();
           }}
           onClick={() => combobox.openDropdown()}
           onFocus={() => combobox.openDropdown()}
           onBlur={() => combobox.closeDropdown()}
+          error={form.errors[formField]}
         />
       </Combobox.Target>
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          {options.length === 0 ? (
-            <Combobox.Empty>Nothing found</Combobox.Empty>
-          ) : (
-            options
-          )}
-        </Combobox.Options>
-      </Combobox.Dropdown>
+      <Combobox.Dropdown>{LocationOptions(searchQuery)}</Combobox.Dropdown>
     </Combobox>
   );
 }

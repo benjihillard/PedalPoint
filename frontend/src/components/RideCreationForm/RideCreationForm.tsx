@@ -1,15 +1,12 @@
-import { Divider, Flex, Paper, Stack, Title } from '@mantine/core';
+import { Flex, Paper, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { DescriptionInput } from './DescriptionInput/DescriptionInput';
-import { EndTimeInput } from './EndTimeInput/EndTimeInput';
-import { FlyerUpload } from './FlyerUpload/FlyerUpload';
-import { LocationInput } from './LocationInput/LocationInput';
-import { MeetTimeInput } from './MeetTimeInput/MeetTimeInput';
 import { SubmitButton } from './SubmitButton/SubmitButton';
-import { TitleInput } from './TitleInput/TitleInput';
-import { WheelsDownTimeInput } from './WheelsDownTimeInput/WheelsDownTimeInput';
-// Icons
-
+// Layouts
+import { DetailsLayout } from './DetailsLayout/DetailsLayout';
+import { LogisticsLayout } from './LogisticsLayout/LogisticsLayout';
+import { RatingLayout } from './RatingLayout/RatingLayout';
+import { RouteLayout } from './RouteLayout/RouteLayout';
+import { TimelineLayout } from './TimelineLayout/TimelineLayout';
 // Validators
 import {
     validateEndTime,
@@ -27,6 +24,19 @@ export function RideCreationForm() {
       meetTime: null as Date | string | null,
       wheelsDownTime: null as string | null,
       endTime: null as Date | null,
+      startLocation: null as string | null,
+      endLocation: null as string | null,
+      isLoop: false,
+      routeLink: '' as string,
+      tags: [] as string[],
+      suggestedGear: [] as string[],
+      riderLimit: Infinity as number,
+      isUnlimited: true as boolean,
+      requiredGear: [] as string[],
+      difficulty: 1 as number,
+      terrain: 1 as number,
+      pace: 0 as number,
+      distance: 0 as number,
     },
 
     validate: {
@@ -56,21 +66,11 @@ export function RideCreationForm() {
 
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap='md'>
-              <TitleInput form={form} />
-              <DescriptionInput form={form} />
-              <FlyerUpload form={form} />
-              <Divider my='sm' />
-              <Title order={3} ta='left' c='blue.7'>
-                Timeline.
-              </Title>
-              <MeetTimeInput form={form} />
-              <WheelsDownTimeInput form={form} />
-              <EndTimeInput form={form} />
-              <Divider my='sm' />
-              <Title order={3} ta='left' c='blue.7'>
-                Route.
-              </Title>
-              <LocationInput form={form} />
+              <DetailsLayout form={form} />
+              <TimelineLayout form={form} />
+              <RouteLayout form={form} />
+              <LogisticsLayout form={form} />
+              <RatingLayout form={form} />
             </Stack>
             <SubmitButton />
           </form>

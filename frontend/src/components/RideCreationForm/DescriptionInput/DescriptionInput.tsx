@@ -15,8 +15,8 @@ export function DescriptionInput({ form }: DescriptionInputProps) {
       label='Description'
       placeholder='Describe the ride, route, and general vibe'
       required
-      size='md'
-      minRows={3}
+      size='lg'
+      minRows={10}
       key={form.key('description')}
       resize='vertical'
       {...form.getInputProps('description')}
